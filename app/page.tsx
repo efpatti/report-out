@@ -36,7 +36,6 @@ interface Slide {
  icon?: React.ElementType;
 }
 
-// Interface para as props do componente de visualização
 interface PresentationViewProps {
  slide: Slide;
  total: number;
@@ -44,9 +43,10 @@ interface PresentationViewProps {
  onNext: () => void;
  onPrev: () => void;
  onExit: () => void;
+ isTransitioning: boolean;
 }
 
-// --- DADOS DA APRESENTAÇÃO (Narrativa Mottu) ---
+// --- DADOS DA APRESENTAÇÃO ---
 const slides: Slide[] = [
  {
   id: 0,
@@ -206,11 +206,8 @@ const slides: Slide[] = [
 ];
 
 // --- COMPONENTES VISUAIS AUXILIARES ---
-
-// Background com Grid Tecnológico
 const BackgroundGrid = () => (
  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 bg-zinc-950">
-  {/* Grid Lines */}
   <div
    className="absolute inset-0 opacity-[0.05]"
    style={{
@@ -218,24 +215,26 @@ const BackgroundGrid = () => (
     backgroundSize: "50px 50px",
    }}
   />
-  {/* Glow Superior */}
   <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#05af31]/10 to-transparent blur-3xl" />
-  {/* Vignette */}
   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50" />
  </div>
 );
 
-// Logo Mottu Estilizado
 const MottuLogo = ({ className = "" }: { className?: string }) => (
  <div
   className={`font-black tracking-tighter flex items-center select-none ${className}`}
  >
-  <Image src="/mottu_logo.ico" width={100} height={100} alt="Logo Mottu" />
+  {/* Usei um placeholder visual caso a imagem não carregue, mas mantive a tag Image */}
+  <div className="flex items-center gap-1">
+   {/* Se a imagem estiver na pasta public, isso funcionará. Caso contrário, renderiza texto */}
+   <div className="relative">
+    <Image src="/mottu_logo.ico" width={100} height={100} alt="Logo Mottu" />
+   </div>
+  </div>
   <div className="w-2 h-2 lg:w-3 lg:h-3 bg-[#05af31] rounded-full ml-1 animate-pulse shadow-[0_0_10px_#05af31]" />
  </div>
 );
 
-// Badge de Tempo
 const TimeBadge = ({ time }: { time: string }) => (
  <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 border border-zinc-800 px-3 py-1 rounded-full">
   <Timer className="w-3 h-3" />
@@ -243,32 +242,198 @@ const TimeBadge = ({ time }: { time: string }) => (
  </div>
 );
 
-// --- COMPONENTE PRINCIPAL ---
+// --- NOVA TRANSIÇÃO FODA (CYBER WARP) ---
+const CinematicTransition = ({
+ slides,
+ currentSlide,
+ targetSlide,
+}: {
+ slides: Slide[];
+ currentSlide: number;
+ targetSlide: number;
+}) => {
+ const nextSlide = slides[targetSlide];
+ const isMovingForward = targetSlide > currentSlide;
 
+ return (
+  <motion.div
+   className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+   initial={{ opacity: 1 }}
+   exit={{ opacity: 0 }}
+   transition={{ duration: 0.5 }}
+  >
+   {/* 1. FUNDO PRETO QUE FECHA (SHUTTER EFFECT) */}
+   <div className="absolute inset-0 flex flex-col">
+    <motion.div
+     className="h-1/2 w-full bg-zinc-950 border-b border-[#05af31]/30 relative overflow-hidden"
+     initial={{ y: "-100%" }}
+     animate={{ y: "0%" }}
+     exit={{ y: "-100%" }}
+     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+     {/* Decoração Tech Topo */}
+     <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#05af31]/10 to-transparent opacity-50" />
+     <div className="absolute bottom-0 right-10 text-[#05af31]/20 font-mono text-[10rem] font-black leading-none select-none opacity-20">
+      {String(targetSlide).padStart(2, "0")}
+     </div>
+    </motion.div>
+
+    <motion.div
+     className="h-1/2 w-full bg-zinc-950 border-t border-[#05af31]/30 relative overflow-hidden"
+     initial={{ y: "100%" }}
+     animate={{ y: "0%" }}
+     exit={{ y: "100%" }}
+     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+     {/* Decoração Tech Base */}
+     <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#05af31]/10 to-transparent opacity-50" />
+    </motion.div>
+   </div>
+
+   {/* 2. LINHA DE SCANNER CENTRAL (FLASH) */}
+   <motion.div
+    className="absolute w-full h-[2px] bg-[#05af31] shadow-[0_0_50px_#05af31] z-20"
+    initial={{ scaleX: 0, opacity: 1 }}
+    animate={{
+     scaleX: [0, 1, 0],
+     opacity: [1, 1, 0],
+    }}
+    transition={{ duration: 1.2, times: [0, 0.5, 1], ease: "easeInOut" }}
+   />
+
+   {/* 3. CONTEÚDO DO PRÓXIMO SLIDE (GLITCH TEXT) */}
+   <motion.div
+    className="relative z-30 flex flex-col items-center justify-center text-center px-4"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ delay: 0.3, duration: 0.2 }}
+   >
+    {/* Subtitulo piscando */}
+    <motion.span
+     className="text-[#05af31] font-mono text-xs uppercase tracking-[0.5em] mb-4 bg-black/50 px-2"
+     animate={{ opacity: [0, 1, 0.5, 1] }}
+     transition={{ duration: 0.3, repeat: 2 }}
+    >
+     Carregando Dados...
+    </motion.span>
+
+    {/* Título Principal com Mascara de Recorte */}
+    <div className="overflow-hidden relative">
+     <motion.h2
+      className="text-6xl lg:text-8xl font-black text-white uppercase italic tracking-tighter"
+      initial={{ y: "100%" }}
+      animate={{ y: "0%" }}
+      transition={{ delay: 0.4, type: "spring", stiffness: 200, damping: 20 }}
+     >
+      {nextSlide.title}
+     </motion.h2>
+     {/* Efeito Fantasma (Glitch) */}
+     <motion.h2
+      className="absolute inset-0 text-6xl lg:text-8xl font-black text-[#05af31] uppercase italic tracking-tighter mix-blend-overlay opacity-50"
+      initial={{ x: -10, opacity: 0 }}
+      animate={{ x: [5, -5, 2, 0], opacity: [0, 0.8, 0] }}
+      transition={{ delay: 0.5, duration: 0.4 }}
+     >
+      {nextSlide.title}
+     </motion.h2>
+    </div>
+
+    {/* Icone Animado */}
+    {nextSlide.icon && (
+     <motion.div
+      initial={{ scale: 0, rotate: -180 }}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={{ delay: 0.5, type: "spring" }}
+      className="mt-8 p-4 border border-zinc-800 bg-zinc-900/50 rounded-full"
+     >
+      <nextSlide.icon className="w-8 h-8 text-[#05af31]" />
+     </motion.div>
+    )}
+   </motion.div>
+
+   {/* 4. SPEED LINES (PARTÍCULAS DE VELOCIDADE) */}
+   <div className="absolute inset-0 z-10 overflow-hidden opacity-20">
+    {[...Array(5)].map((_, i) => (
+     <motion.div
+      key={i}
+      className="absolute h-[1px] bg-white w-full"
+      style={{ top: `${20 * i + 10}%` }}
+      initial={{ x: isMovingForward ? "100%" : "-100%" }}
+      animate={{ x: isMovingForward ? "-100%" : "100%" }}
+      transition={{
+       duration: 0.8,
+       repeat: Infinity,
+       ease: "linear",
+       delay: i * 0.1,
+      }}
+     />
+    ))}
+   </div>
+  </motion.div>
+ );
+};
+
+// --- COMPONENTE PRINCIPAL ---
 export default function MottuPresentation() {
  const [currentSlide, setCurrentSlide] = useState<number>(0);
  const [viewMode, setViewMode] = useState<"grid" | "presentation">("grid");
+ const [isTransitioning, setIsTransitioning] = useState(false);
+ const [targetSlide, setTargetSlide] = useState<number | null>(null);
 
- // Navegação
+ // ATENÇÃO: TIMEOUT REDUZIDO PARA 1200MS PARA FICAR MAIS RÁPIDO
+ const TRANSITION_DURATION = 1200;
+
  const handleNext = useCallback(() => {
-  if (currentSlide < slides.length - 1) setCurrentSlide((p) => p + 1);
- }, [currentSlide]);
+  if (currentSlide < slides.length - 1 && !isTransitioning) {
+   setIsTransitioning(true);
+   setTargetSlide(currentSlide + 1);
+   setTimeout(() => {
+    setCurrentSlide(currentSlide + 1);
+    setIsTransitioning(false);
+    setTargetSlide(null);
+   }, TRANSITION_DURATION);
+  }
+ }, [currentSlide, isTransitioning]);
 
  const handlePrev = useCallback(() => {
-  if (currentSlide > 0) setCurrentSlide((p) => p - 1);
- }, [currentSlide]);
+  if (currentSlide > 0 && !isTransitioning) {
+   setIsTransitioning(true);
+   setTargetSlide(currentSlide - 1);
+   setTimeout(() => {
+    setCurrentSlide(currentSlide - 1);
+    setIsTransitioning(false);
+    setTargetSlide(null);
+   }, TRANSITION_DURATION);
+  }
+ }, [currentSlide, isTransitioning]);
 
- // Teclado
+ const handleGridSelect = useCallback(
+  (id: number) => {
+   if (!isTransitioning) {
+    setIsTransitioning(true);
+    setTargetSlide(id);
+    setTimeout(() => {
+     setCurrentSlide(id);
+     setViewMode("presentation");
+     setIsTransitioning(false);
+     setTargetSlide(null);
+    }, TRANSITION_DURATION);
+   }
+  },
+  [isTransitioning]
+ );
+
  useEffect(() => {
   const handleKeyPress = (e: KeyboardEvent) => {
-   if (viewMode !== "presentation") return;
+   if (viewMode !== "presentation" || isTransitioning) return;
    if (e.key === "ArrowRight" || e.key === " ") handleNext();
    if (e.key === "ArrowLeft") handlePrev();
    if (e.key === "Escape") setViewMode("grid");
   };
   window.addEventListener("keydown", handleKeyPress);
   return () => window.removeEventListener("keydown", handleKeyPress);
- }, [viewMode, handleNext, handlePrev]);
+ }, [viewMode, handleNext, handlePrev, isTransitioning]);
 
  return (
   <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-[#05af31] selection:text-black overflow-hidden relative">
@@ -279,21 +444,37 @@ export default function MottuPresentation() {
      <GridView
       key="grid"
       slides={slides}
-      onSelect={(id) => {
-       setCurrentSlide(id);
-       setViewMode("presentation");
-      }}
+      onSelect={handleGridSelect}
+      isTransitioning={isTransitioning}
      />
     ) : (
-     <PresentationView
-      key="presentation"
-      slide={slides[currentSlide]}
-      total={slides.length}
-      current={currentSlide}
-      onNext={handleNext}
-      onPrev={handlePrev}
-      onExit={() => setViewMode("grid")}
-     />
+     <>
+      {/* A transição fica "por cima" devido ao z-index, mas dentro do mesmo contexto */}
+      <AnimatePresence>
+       {isTransitioning && targetSlide !== null && (
+        <CinematicTransition
+         key="transition-overlay"
+         slides={slides}
+         currentSlide={currentSlide}
+         targetSlide={targetSlide}
+        />
+       )}
+      </AnimatePresence>
+
+      {/* Renderiza o slide, mas escondido visualmente pela transição enquanto troca */}
+      {!isTransitioning && (
+       <PresentationView
+        key="presentation-content"
+        slide={slides[currentSlide]}
+        total={slides.length}
+        current={currentSlide}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        onExit={() => setViewMode("grid")}
+        isTransitioning={isTransitioning}
+       />
+      )}
+     </>
     )}
    </AnimatePresence>
   </div>
@@ -301,13 +482,14 @@ export default function MottuPresentation() {
 }
 
 // --- SUB-COMPONENTES DE VISUALIZAÇÃO ---
-
 const GridView = ({
  slides,
  onSelect,
+ isTransitioning,
 }: {
  slides: Slide[];
  onSelect: (id: number) => void;
+ isTransitioning: boolean;
 }) => (
  <motion.div
   initial={{ opacity: 0, scale: 0.95 }}
@@ -338,26 +520,53 @@ const GridView = ({
    {slides.map((s, idx) => (
     <motion.button
      key={s.id}
-     onClick={() => onSelect(s.id)}
-     className="group relative flex flex-col justify-between bg-zinc-900/40 border border-zinc-800 hover:border-[#05af31] 
-                     p-6 text-left rounded-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(5,175,49,0.1)] h-[220px]"
+     onClick={() => !isTransitioning && onSelect(s.id)}
+     disabled={isTransitioning}
+     className={`group relative flex flex-col justify-between border p-6 text-left rounded-lg transition-all duration-300 h-[220px]
+            ${
+             isTransitioning
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(5,175,49,0.1)]"
+            }
+            ${
+             s.type === "cover"
+              ? "bg-gradient-to-br from-zinc-900 to-zinc-950 border-[#05af31]/30"
+              : "bg-zinc-900/40 border-zinc-800 hover:border-[#05af31]"
+            }
+          `}
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
      transition={{ delay: idx * 0.05 }}
     >
      <div className="w-full flex justify-between items-start">
-      <span className="font-mono text-zinc-600 text-sm group-hover:text-[#05af31] transition-colors">
+      <span
+       className={`font-mono text-sm transition-colors ${
+        isTransitioning
+         ? "text-zinc-600"
+         : "text-zinc-600 group-hover:text-[#05af31]"
+       }`}
+      >
        {String(idx).padStart(2, "0")}
       </span>
       {s.icon ? (
-       <s.icon className="w-5 h-5 text-zinc-600 group-hover:text-white transition-colors" />
+       <s.icon
+        className={`w-5 h-5 transition-colors ${
+         isTransitioning
+          ? "text-zinc-600"
+          : "text-zinc-600 group-hover:text-white"
+        }`}
+       />
       ) : (
        <Activity className="w-5 h-5 text-zinc-600" />
       )}
      </div>
 
      <div>
-      <h3 className="text-xl font-bold leading-none mb-2 text-white group-hover:text-[#05af31] transition-colors">
+      <h3
+       className={`text-xl font-bold leading-none mb-2 transition-colors ${
+        isTransitioning ? "text-white" : "text-white group-hover:text-[#05af31]"
+       }`}
+      >
        {s.title}
       </h3>
       {s.subtitle && (
@@ -369,7 +578,13 @@ const GridView = ({
       <span className="text-[10px] uppercase tracking-wider text-zinc-500">
        {s.type}
       </span>
-      <span className="text-[10px] text-zinc-600 group-hover:text-white transition-colors">
+      <span
+       className={`text-[10px] transition-colors ${
+        isTransitioning
+         ? "text-zinc-600"
+         : "text-zinc-600 group-hover:text-white"
+       }`}
+      >
        {s.duration}
       </span>
      </div>
@@ -386,6 +601,7 @@ const PresentationView = ({
  onNext,
  onPrev,
  onExit,
+ isTransitioning,
 }: PresentationViewProps) => {
  const Icon = slide.icon;
 
@@ -402,7 +618,8 @@ const PresentationView = ({
     <div className="flex flex-col items-end gap-2">
      <button
       onClick={onExit}
-      className="p-2 hover:bg-white/10 rounded-full transition-colors group"
+      disabled={isTransitioning}
+      className="p-2 hover:bg-white/10 rounded-full transition-colors group disabled:opacity-30"
      >
       <X className="w-6 h-6 text-zinc-500 group-hover:text-white" />
      </button>
@@ -417,7 +634,7 @@ const PresentationView = ({
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 1.05, filter: "blur(5px)" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} // Custom easing
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="w-full max-w-[1400px] flex justify-center"
      >
       {slide.type === "cover" && <CoverSlide slide={slide} />}
@@ -457,7 +674,7 @@ const PresentationView = ({
         ←
        </kbd>
        <kbd className="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded text-xs text-zinc-500">
-        space
+        →
        </kbd>
        <kbd className="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded text-xs text-zinc-500">
         esc
@@ -466,14 +683,14 @@ const PresentationView = ({
      </div>
      <button
       onClick={onPrev}
-      disabled={current === 0}
+      disabled={current === 0 || isTransitioning}
       className="p-3 bg-zinc-900 hover:bg-[#05af31] border border-zinc-800 hover:border-[#05af31] hover:text-black rounded-full disabled:opacity-20 disabled:hover:bg-zinc-900 disabled:hover:text-white transition-all"
      >
       <ChevronLeft className="w-6 h-6" />
      </button>
      <button
       onClick={onNext}
-      disabled={current === total - 1}
+      disabled={current === total - 1 || isTransitioning}
       className="p-3 bg-zinc-900 hover:bg-[#05af31] border border-zinc-800 hover:border-[#05af31] hover:text-black rounded-full disabled:opacity-20 disabled:hover:bg-zinc-900 disabled:hover:text-white transition-all"
      >
       <ChevronRight className="w-6 h-6" />
@@ -485,7 +702,6 @@ const PresentationView = ({
 };
 
 // --- SLIDE TEMPLATES ---
-
 const CoverSlide = ({ slide }: { slide: Slide }) => (
  <div className="text-center relative w-full flex flex-col items-center justify-center">
   <motion.div
@@ -563,11 +779,11 @@ const ContentSlide = ({
      animate={{ opacity: 1, x: 0 }}
      transition={{ delay: i * 0.1 + 0.3, type: "spring", stiffness: 100 }}
      className={`p-6 rounded-r-xl border-l-4 transition-all group
-                    ${
-                     bullet.highlight
-                      ? "bg-gradient-to-r from-[#05af31]/10 to-transparent border-[#05af31]"
-                      : "bg-transparent border-zinc-800 hover:bg-zinc-900/50 hover:border-zinc-600"
-                    }`}
+                        ${
+                         bullet.highlight
+                          ? "bg-gradient-to-r from-[#05af31]/10 to-transparent border-[#05af31]"
+                          : "bg-transparent border-zinc-800 hover:bg-zinc-900/50 hover:border-zinc-600"
+                        }`}
     >
      <div className="flex items-baseline gap-4">
       <span
@@ -613,7 +829,6 @@ const SplitSlide = ({
  Icon: React.ElementType | undefined;
 }) => (
  <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-  {/* Left Side: Context */}
   <div className="relative">
    <div className="absolute -left-10 top-0 bottom-0 w-1 bg-zinc-800/50" />
    <motion.div
@@ -635,7 +850,6 @@ const SplitSlide = ({
    </p>
   </div>
 
-  {/* Right Side: Data */}
   <div className="space-y-6">
    {slide.bullets?.map((bullet, i) => (
     <motion.div
@@ -644,11 +858,11 @@ const SplitSlide = ({
      animate={{ opacity: 1, y: 0 }}
      transition={{ delay: 0.2 + i * 0.1 }}
      className={`relative p-8 rounded-xl border transition-all hover:scale-[1.02]
-                        ${
-                         bullet.highlight
-                          ? "bg-zinc-900 border-[#05af31] shadow-[0_0_30px_rgba(5,175,49,0.1)]"
-                          : "bg-zinc-900/30 border-zinc-800"
-                        }`}
+                            ${
+                             bullet.highlight
+                              ? "bg-zinc-900 border-[#05af31] shadow-[0_0_30px_rgba(5,175,49,0.1)]"
+                              : "bg-zinc-900/30 border-zinc-800"
+                            }`}
     >
      {bullet.highlight && (
       <div className="absolute -top-3 -right-3 bg-[#05af31] text-black p-2 rounded-lg shadow-lg">
@@ -702,11 +916,11 @@ const ImpactSlide = ({ slide }: { slide: Slide }) => (
      animate={{ opacity: 1, y: 0 }}
      transition={{ delay: i * 0.1 + 0.4 }}
      className={`flex flex-col justify-between p-8 border hover:bg-zinc-900 transition-colors
-                        ${
-                         bullet.highlight
-                          ? "border-[#05af31] bg-[#05af31]/5"
-                          : "border-zinc-800 bg-zinc-900/20"
-                        }`}
+                            ${
+                             bullet.highlight
+                              ? "border-[#05af31] bg-[#05af31]/5"
+                              : "border-zinc-800 bg-zinc-900/20"
+                            }`}
     >
      <BarChart3
       className={`w-8 h-8 mb-4 ${
