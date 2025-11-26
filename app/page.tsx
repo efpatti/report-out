@@ -31,9 +31,11 @@ interface Slide {
  subtitle?: string;
  bullets?: BulletPoint[];
  highlight?: string;
- type: "cover" | "content" | "split" | "impact";
+ type: "cover" | "content" | "split" | "impact" | "webview";
  duration: string;
  icon?: React.ElementType;
+ url?: string;
+ features?: string[];
 }
 
 interface PresentationViewProps {
@@ -46,7 +48,6 @@ interface PresentationViewProps {
  isTransitioning: boolean;
 }
 
-// --- DADOS DA APRESENTAÇÃO ---
 const slides: Slide[] = [
  {
   id: 0,
@@ -131,6 +132,22 @@ const slides: Slide[] = [
  },
  {
   id: 4,
+  title: "Experiência Digital",
+  subtitle: "O Site que Mudou Tudo",
+  icon: Activity,
+  type: "webview",
+  url: "https://bonificacao-ui.mottu.io/?type=motorcycle&secao=1&lang=pt",
+  features: [
+   "Entender as regras de forma visual",
+   "Simular o dia de bônus em tempo real",
+   "Tirar dúvidas de forma autônoma",
+   "Dashboard personalizado por prestador"
+  ],
+  highlight: "100% Interativo | Zero Fricção",
+  duration: "1:30",
+ },
+ {
+  id: 5,
   title: "Cultura de Dono",
   subtitle: "Meritocracia na Veia",
   icon: Award,
@@ -147,7 +164,7 @@ const slides: Slide[] = [
   duration: "1:05",
  },
  {
-  id: 5,
+  id: 6,
   title: "Gamificação",
   subtitle: "Elevando a Barra",
   icon: TrendingUp,
@@ -175,7 +192,7 @@ const slides: Slide[] = [
   duration: "1:05",
  },
  {
-  id: 6,
+  id: 7,
   title: "IMPACTO",
   subtitle: "Contra dados não há argumentos",
   type: "impact",
@@ -189,7 +206,7 @@ const slides: Slide[] = [
   duration: "0:50",
  },
  {
-  id: 7,
+  id: 8,
   title: "Legado",
   subtitle: "De Estagiário a Owner",
   icon: CheckCircle2,
@@ -641,6 +658,7 @@ const PresentationView = ({
       {slide.type === "content" && <ContentSlide slide={slide} Icon={Icon} />}
       {slide.type === "split" && <SplitSlide slide={slide} Icon={Icon} />}
       {slide.type === "impact" && <ImpactSlide slide={slide} />}
+      {slide.type === "webview" && <WebViewSlide slide={slide} Icon={Icon} />}
      </motion.div>
     </AnimatePresence>
    </div>
@@ -947,5 +965,187 @@ const ImpactSlide = ({ slide }: { slide: Slide }) => (
    <div className="w-2 h-2 bg-[#05af31] rounded-full animate-ping" />
    {slide.highlight}
   </motion.div>
+ </div>
+);
+
+const WebViewSlide = ({
+ slide,
+ Icon,
+}: {
+ slide: Slide;
+ Icon: React.ElementType | undefined;
+}) => (
+ <div className="w-full max-w-[1600px] grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center px-4">
+  {/* LEFT SIDE - Title + Features */}
+  <div className="lg:col-span-5 space-y-8">
+   <div className="space-y-4">
+    <motion.div
+     initial={{ opacity: 0, x: -50 }}
+     animate={{ opacity: 1, x: 0 }}
+     transition={{ delay: 0.2 }}
+     className="inline-flex items-center gap-2 text-[#05af31] font-bold border border-[#05af31]/30 px-4 py-1.5 rounded-full text-xs uppercase tracking-wider"
+    >
+     {Icon && <Icon className="w-4 h-4" />}
+     Produto Final
+    </motion.div>
+
+    <motion.h2
+     initial={{ opacity: 0, x: -50 }}
+     animate={{ opacity: 1, x: 0 }}
+     transition={{ delay: 0.3 }}
+     className="text-5xl lg:text-7xl font-black uppercase leading-[0.9] text-white"
+    >
+     {slide.title}
+    </motion.h2>
+
+    <motion.p
+     initial={{ opacity: 0, x: -50 }}
+     animate={{ opacity: 1, x: 0 }}
+     transition={{ delay: 0.4 }}
+     className="text-xl text-zinc-400 font-medium"
+    >
+     {slide.subtitle}
+    </motion.p>
+   </div>
+
+   {/* Features List */}
+   <div className="space-y-4">
+    {slide.features?.map((feature, i) => (
+     <motion.div
+      key={i}
+      initial={{ opacity: 0, x: -30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.5 + i * 0.1 }}
+      className="flex items-start gap-4 group"
+     >
+      <div className="mt-1 w-6 h-6 rounded-full border-2 border-[#05af31] flex items-center justify-center flex-shrink-0 group-hover:bg-[#05af31] transition-colors">
+       <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.7 + i * 0.1, type: "spring" }}
+        className="w-2 h-2 bg-[#05af31] rounded-full group-hover:bg-black"
+       />
+      </div>
+      <p className="text-lg text-zinc-300 group-hover:text-white transition-colors">
+       {feature}
+      </p>
+     </motion.div>
+    ))}
+   </div>
+
+   {/* Highlight Badge */}
+   <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 1 }}
+    className="inline-flex items-center gap-2 px-6 py-3 bg-[#05af31]/10 border border-[#05af31]/30 rounded-lg"
+   >
+    <div className="w-2 h-2 bg-[#05af31] rounded-full animate-pulse" />
+    <span className="text-[#05af31] font-mono text-sm font-bold">
+     {slide.highlight}
+    </span>
+   </motion.div>
+  </div>
+
+  {/* RIGHT SIDE - WebView in Device Frame */}
+  <div className="lg:col-span-7 relative">
+   {/* Glow Effect Background */}
+   <div className="absolute inset-0 bg-[#05af31]/20 blur-[120px] rounded-full scale-75" />
+
+   {/* Device Frame Container */}
+   <motion.div
+    initial={{ opacity: 0, scale: 0.8, rotateY: -25 }}
+    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+    transition={{ delay: 0.4, duration: 0.8, type: "spring" }}
+    className="relative z-10"
+   >
+    {/* Desktop Browser Frame */}
+    <div className="relative bg-zinc-900 rounded-2xl border-2 border-zinc-800 shadow-[0_0_80px_rgba(5,175,49,0.3)] overflow-hidden">
+     {/* Browser Top Bar */}
+     <div className="bg-zinc-800/80 backdrop-blur px-4 py-3 flex items-center gap-3 border-b border-zinc-700">
+      <div className="flex gap-2">
+       <div className="w-3 h-3 rounded-full bg-red-500/80" />
+       <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+       <div className="w-3 h-3 rounded-full bg-green-500/80" />
+      </div>
+      <div className="flex-1 bg-zinc-900/50 rounded-lg px-3 py-1.5 flex items-center gap-2">
+       <div className="w-3 h-3 text-zinc-600">🔒</div>
+       <span className="text-[10px] text-zinc-500 font-mono truncate">
+        {slide.url}
+       </span>
+      </div>
+     </div>
+
+     {/* Website Content - iframe */}
+     <div className="relative bg-black aspect-[16/10] overflow-hidden">
+      <motion.iframe
+       initial={{ opacity: 0 }}
+       animate={{ opacity: 1 }}
+       transition={{ delay: 0.8 }}
+       src={slide.url}
+       className="w-full h-full border-0"
+       title="Mottu Bonificação"
+       sandbox="allow-scripts allow-same-origin"
+      />
+
+      {/* Overlay indicators - Pulsing Hotspots */}
+      <motion.div
+       initial={{ opacity: 0 }}
+       animate={{ opacity: [0.5, 1, 0.5] }}
+       transition={{ duration: 2, repeat: Infinity }}
+       className="absolute top-[20%] left-[15%] w-4 h-4 bg-[#05af31] rounded-full blur-sm"
+      />
+      <motion.div
+       initial={{ opacity: 0 }}
+       animate={{ opacity: [0.5, 1, 0.5] }}
+       transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+       className="absolute top-[50%] right-[20%] w-4 h-4 bg-[#05af31] rounded-full blur-sm"
+      />
+     </div>
+
+     {/* Bottom Glow Line */}
+     <div className="h-1 bg-gradient-to-r from-transparent via-[#05af31] to-transparent" />
+    </div>
+
+    {/* Floating Stats Pills */}
+    <motion.div
+     initial={{ opacity: 0, y: 20 }}
+     animate={{ opacity: 1, y: 0 }}
+     transition={{ delay: 1.2 }}
+     className="absolute -bottom-6 -left-6 bg-zinc-900 border border-[#05af31]/50 rounded-xl px-4 py-2 shadow-[0_0_30px_rgba(5,175,49,0.2)]"
+    >
+     <div className="text-xs text-zinc-500 font-mono">Prestadores Ativos</div>
+     <div className="text-2xl font-black text-[#05af31]">100%</div>
+    </motion.div>
+
+    <motion.div
+     initial={{ opacity: 0, y: -20 }}
+     animate={{ opacity: 1, y: 0 }}
+     transition={{ delay: 1.3 }}
+     className="absolute -top-6 -right-6 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2 shadow-2xl"
+    >
+     <div className="text-xs text-zinc-500 font-mono">Tickets Reduzidos</div>
+     <div className="text-2xl font-black text-white">-80%</div>
+    </motion.div>
+   </motion.div>
+
+   {/* Animated Grid Lines */}
+   <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
+    {[...Array(3)].map((_, i) => (
+     <motion.div
+      key={i}
+      className="absolute h-px w-full bg-[#05af31]"
+      style={{ top: `${(i + 1) * 25}%` }}
+      initial={{ scaleX: 0 }}
+      animate={{ scaleX: [0, 1, 0] }}
+      transition={{
+       duration: 2,
+       repeat: Infinity,
+       delay: i * 0.3,
+      }}
+     />
+    ))}
+   </div>
+  </div>
  </div>
 );
