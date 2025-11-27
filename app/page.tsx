@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-// --- TIPOS E INTERFACES ---
 interface BulletPoint {
  text: string;
  subpoints?: string[];
@@ -141,7 +140,7 @@ const slides: Slide[] = [
    "Entender as regras de forma visual",
    "Simular o dia de bônus em tempo real",
    "Tirar dúvidas de forma autônoma",
-   "Dashboard personalizado por prestador"
+   "Dashboard personalizado por prestador",
   ],
   highlight: "100% Interativo | Zero Fricção",
   duration: "1:30",
@@ -241,9 +240,7 @@ const MottuLogo = ({ className = "" }: { className?: string }) => (
  <div
   className={`font-black tracking-tighter flex items-center select-none ${className}`}
  >
-  {/* Usei um placeholder visual caso a imagem não carregue, mas mantive a tag Image */}
   <div className="flex items-center gap-1">
-   {/* Se a imagem estiver na pasta public, isso funcionará. Caso contrário, renderiza texto */}
    <div className="relative">
     <Image src="/mottu_logo.ico" width={100} height={100} alt="Logo Mottu" />
    </div>
@@ -279,7 +276,6 @@ const CinematicTransition = ({
    exit={{ opacity: 0 }}
    transition={{ duration: 0.5 }}
   >
-   {/* 1. FUNDO PRETO QUE FECHA (SHUTTER EFFECT) */}
    <div className="absolute inset-0 flex flex-col">
     <motion.div
      className="h-1/2 w-full bg-zinc-950 border-b border-[#05af31]/30 relative overflow-hidden"
@@ -288,7 +284,6 @@ const CinematicTransition = ({
      exit={{ y: "-100%" }}
      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-     {/* Decoração Tech Topo */}
      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#05af31]/10 to-transparent opacity-50" />
      <div className="absolute bottom-0 right-10 text-[#05af31]/20 font-mono text-[10rem] font-black leading-none select-none opacity-20">
       {String(targetSlide).padStart(2, "0")}
