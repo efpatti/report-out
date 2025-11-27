@@ -51,27 +51,45 @@ const slides: Slide[] = [
  {
   id: 0,
   title: "Enzo Ferracini",
-  subtitle: "FIELD SERVICES | REPORT OUT",
+  subtitle: "ESTAGIÁRIO DE FIELD SERVICES | REPORT OUT",
   highlight: "Julho - Dezembro 2025",
   type: "cover",
   duration: "0:30",
  },
  {
   id: 1,
-  title: "Missão & Cultura",
-  subtitle: "Empoderar quem nos move",
-  icon: Bike,
+  title: "Missão",
+  subtitle: "Workforce Engagement",
+  icon: Target,
   bullets: [
-   { text: "Democratizar a geração de renda.", highlight: false },
    {
-    text: "Meritocracia Radical: Quem entrega mais, ganha mais.",
+    text: "Responsável pela área Workforce Engagement",
+    subpoints: [
+     "Elo estratégico entre operação e prestadores.",
+     "Engajamento, comunicação e bonificação.",
+    ],
+    highlight: false,
+   },
+   {
+    text: "Programa de Bonificação: Transparência Radical",
+    subpoints: [
+     "Sistema de pontos claro e automatizado.",
+     "Comunicação estruturada sobre desempenho.",
+    ],
     highlight: true,
    },
    {
-    text: "Ambiente de alta performance e 'mão na graxa'.",
+    text: "Automação e Eficiência Operacional",
+    subpoints: [
+     "Processo 100% automatizado de cálculo e fechamento.",
+     "Extrato diário automatizado por e-mail.",
+    ],
     highlight: false,
    },
-   { text: "Foco obsessivo no cliente (O Entregador).", highlight: true },
+   {
+    text: "Transformar bonificação em ferramenta estratégica que educa, engaja e motiva.",
+    highlight: true,
+   },
   ],
   type: "content",
   duration: "0:45",
@@ -221,7 +239,6 @@ const slides: Slide[] = [
  },
 ];
 
-// --- COMPONENTES VISUAIS AUXILIARES ---
 const BackgroundGrid = () => (
  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 bg-zinc-950">
   <div
@@ -256,7 +273,6 @@ const TimeBadge = ({ time }: { time: string }) => (
  </div>
 );
 
-// --- NOVA TRANSIÇÃO FODA (CYBER WARP) ---
 const CinematicTransition = ({
  slides,
  currentSlide,
@@ -297,12 +313,10 @@ const CinematicTransition = ({
      exit={{ y: "100%" }}
      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-     {/* Decoração Tech Base */}
      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#05af31]/10 to-transparent opacity-50" />
     </motion.div>
    </div>
 
-   {/* 2. LINHA DE SCANNER CENTRAL (FLASH) */}
    <motion.div
     className="absolute w-full h-[2px] bg-[#05af31] shadow-[0_0_50px_#05af31] z-20"
     initial={{ scaleX: 0, opacity: 1 }}
@@ -313,7 +327,6 @@ const CinematicTransition = ({
     transition={{ duration: 1.2, times: [0, 0.5, 1], ease: "easeInOut" }}
    />
 
-   {/* 3. CONTEÚDO DO PRÓXIMO SLIDE (GLITCH TEXT) */}
    <motion.div
     className="relative z-30 flex flex-col items-center justify-center text-center px-4"
     initial={{ opacity: 0 }}
@@ -330,7 +343,6 @@ const CinematicTransition = ({
      Carregando Dados...
     </motion.span>
 
-    {/* Título Principal com Mascara de Recorte */}
     <div className="overflow-hidden relative">
      <motion.h2
       className="text-6xl lg:text-8xl font-black text-white uppercase italic tracking-tighter"
@@ -340,7 +352,6 @@ const CinematicTransition = ({
      >
       {nextSlide.title}
      </motion.h2>
-     {/* Efeito Fantasma (Glitch) */}
      <motion.h2
       className="absolute inset-0 text-6xl lg:text-8xl font-black text-[#05af31] uppercase italic tracking-tighter mix-blend-overlay opacity-50"
       initial={{ x: -10, opacity: 0 }}
@@ -351,7 +362,6 @@ const CinematicTransition = ({
      </motion.h2>
     </div>
 
-    {/* Icone Animado */}
     {nextSlide.icon && (
      <motion.div
       initial={{ scale: 0, rotate: -180 }}
@@ -364,7 +374,6 @@ const CinematicTransition = ({
     )}
    </motion.div>
 
-   {/* 4. SPEED LINES (PARTÍCULAS DE VELOCIDADE) */}
    <div className="absolute inset-0 z-10 overflow-hidden opacity-20">
     {[...Array(5)].map((_, i) => (
      <motion.div
@@ -386,14 +395,12 @@ const CinematicTransition = ({
  );
 };
 
-// --- COMPONENTE PRINCIPAL ---
 export default function MottuPresentation() {
  const [currentSlide, setCurrentSlide] = useState<number>(0);
  const [viewMode, setViewMode] = useState<"grid" | "presentation">("grid");
  const [isTransitioning, setIsTransitioning] = useState(false);
  const [targetSlide, setTargetSlide] = useState<number | null>(null);
 
- // ATENÇÃO: TIMEOUT REDUZIDO PARA 1200MS PARA FICAR MAIS RÁPIDO
  const TRANSITION_DURATION = 1200;
 
  const handleNext = useCallback(() => {
@@ -473,7 +480,6 @@ export default function MottuPresentation() {
        )}
       </AnimatePresence>
 
-      {/* Renderiza o slide, mas escondido visualmente pela transição enquanto troca */}
       {!isTransitioning && (
        <PresentationView
         key="presentation-content"
@@ -493,7 +499,6 @@ export default function MottuPresentation() {
  );
 }
 
-// --- SUB-COMPONENTES DE VISUALIZAÇÃO ---
 const GridView = ({
  slides,
  onSelect,
@@ -624,7 +629,6 @@ const PresentationView = ({
    animate={{ opacity: 1 }}
    exit={{ opacity: 0 }}
   >
-   {/* Top Bar */}
    <div className="absolute top-0 w-full p-6 lg:p-8 flex justify-between items-start z-30">
     <MottuLogo className="text-2xl" />
     <div className="flex flex-col items-end gap-2">
@@ -638,7 +642,6 @@ const PresentationView = ({
     </div>
    </div>
 
-   {/* Main Slide Area */}
    <div className="flex-1 flex items-center justify-center p-6 lg:p-16 overflow-hidden">
     <AnimatePresence mode="wait">
      <motion.div
@@ -658,7 +661,6 @@ const PresentationView = ({
     </AnimatePresence>
    </div>
 
-   {/* Footer / Controls */}
    <div className="absolute bottom-0 w-full p-6 lg:p-10 flex justify-between items-end z-30">
     <div className="flex flex-col gap-2">
      <span className="text-xs text-zinc-500 font-mono">
@@ -714,7 +716,6 @@ const PresentationView = ({
  );
 };
 
-// --- SLIDE TEMPLATES ---
 const CoverSlide = ({ slide }: { slide: Slide }) => (
  <div className="text-center relative w-full flex flex-col items-center justify-center">
   <motion.div
